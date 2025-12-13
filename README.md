@@ -201,6 +201,39 @@ Configuration is managed via environment variables using Pydantic Settings:
 | `APP_VERSION` | Application version | `0.1.0` | No |
 | `DEBUG` | Enable debug mode | `False` | No |
 
+### CORS Configuration
+
+The service is configured with permissive CORS settings for development:
+- `allow_origins=["*"]` - Accepts requests from any origin
+- `allow_credentials=False` - Credentials (cookies, auth headers) are not allowed
+
+**For production**, you should configure CORS appropriately:
+
+```python
+# Option 1: Keep wildcard origins (no credentials)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,  # Must be False with wildcard
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Option 2: Specify explicit origins (with or without credentials)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://yourdomain.com",
+        "https://app.yourdomain.com",
+    ],
+    allow_credentials=True,  # Can be True with explicit origins
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+```
+
+**Note**: The CORS specification prohibits using `allow_origins=["*"]` with `allow_credentials=True`. Modern browsers will reject this configuration.
+
 ## Development
 
 ### Running tests
