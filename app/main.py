@@ -6,6 +6,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 
 from app.api.v1 import router as v1_router
 from app.config import settings
@@ -62,14 +63,9 @@ app.include_router(v1_router, prefix="/api/v1", tags=["v1"])
 
 
 @app.get("/", include_in_schema=False)
-async def root() -> dict[str, str]:
-    """Root endpoint redirecting to API documentation."""
-    return {
-        "service": settings.app_name,
-        "version": settings.app_version,
-        "docs": "/docs",
-        "health": "/api/v1/health",
-    }
+async def root() -> RedirectResponse:
+    """Redirect root to API documentation."""
+    return RedirectResponse(url="/docs")
 
 
 if __name__ == "__main__":
