@@ -56,7 +56,7 @@ pip install -e .
 Or using uv (recommended):
 
 ```bash
-uv sync
+uv sync --locked
 ```
 
 ### 3. Configure environment variables
@@ -307,27 +307,23 @@ mypy app/
 
 ### Docker (Optional)
 
-Create a `Dockerfile`:
+This repository includes a `Dockerfile` that:
+- installs dependencies from `uv.lock` (reproducible installs)
+- uses a multi-stage build so the final image does **not** include `uv`
+- runs Uvicorn bound to `0.0.0.0` so it can be published to `localhost`
 
-```dockerfile
-FROM python:3.13-slim
-
-WORKDIR /app
-
-COPY pyproject.toml .
-RUN pip install -e .
-
-COPY app/ ./app/
-COPY .env .env
-
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
-```
-
-Build and run:
+Build and run (recommended):
 
 ```bash
-docker build -t complaint-service .
-docker run -p 8000:8000 complaint-service
+docker build -t complaint-service:local .
+docker run --rm -p 8000:8000 --env-file .env complaint-service:local
+```
+
+Run two containers on the same machine (use different **host** ports):
+
+```bash
+docker run -d --name complaint-1 -p 8000:8000 --env-file .env complaint-service:local
+docker run -d --name complaint-2 -p 8001:8000 --env-file .env complaint-service:local
 ```
 
 ### Azure App Service
