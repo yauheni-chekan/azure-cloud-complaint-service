@@ -1,0 +1,31 @@
+.git/
+.gitignore
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+
+# Virtualenvs
+.venv/
+venv/
+ENV/
+
+# Local env files (do not bake secrets into images)
+.env
+**/.env
+.envrc
+
+# Dev-only folders
+tests/
+examples/
+
+# Editor/OS
+.vscode/
+.idea/
+.DS_Store
