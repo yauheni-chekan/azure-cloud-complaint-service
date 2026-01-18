@@ -15,7 +15,7 @@ class TestServiceBusComplaintSender:
     """Tests for ServiceBusComplaintSender class."""
 
     @pytest.mark.asyncio
-    async def test_connect_success(self, mocker, mock_env_vars: None) -> None:  # noqa: ARG002
+    async def test_connect_success(self, mocker) -> None:
         """Test successful connection to Service Bus."""
         mock_client = MagicMock()
         mock_from_conn = mocker.patch(
@@ -30,7 +30,7 @@ class TestServiceBusComplaintSender:
         mock_from_conn.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_connect_failure(self, mocker, mock_env_vars: None) -> None:  # noqa: ARG002
+    async def test_connect_failure(self, mocker) -> None:
         """Test connection failure handling."""
         mocker.patch(
             "app.services.servicebus_client.ServiceBusClient.from_connection_string",
@@ -43,7 +43,7 @@ class TestServiceBusComplaintSender:
             await sender.connect()
 
     @pytest.mark.asyncio
-    async def test_disconnect(self, mock_env_vars: None) -> None:  # noqa: ARG002
+    async def test_disconnect(self) -> None:
         """Test disconnection from Service Bus."""
         sender = ServiceBusComplaintSender()
         mock_client = AsyncMock()
@@ -54,7 +54,7 @@ class TestServiceBusComplaintSender:
         mock_client.close.assert_awaited_once()
 
     @pytest.mark.asyncio
-    async def test_disconnect_no_client(self, mock_env_vars: None) -> None:  # noqa: ARG002
+    async def test_disconnect_no_client(self) -> None:
         """Test disconnect when client is None does not raise error."""
         sender = ServiceBusComplaintSender()
         sender._client = None
@@ -65,9 +65,7 @@ class TestServiceBusComplaintSender:
     @pytest.mark.asyncio
     async def test_send_complaint_success(
         self,
-        mocker,
-        mock_env_vars: None,
-        sample_booking_id: UUID,  # noqa: ARG002
+        sample_booking_id: UUID,
     ) -> None:
         """Test successful complaint message sending."""
         # Setup mocks
@@ -110,8 +108,7 @@ class TestServiceBusComplaintSender:
     @pytest.mark.asyncio
     async def test_send_complaint_no_client(
         self,
-        mock_env_vars: None,
-        sample_booking_id: UUID,  # noqa: ARG002
+        sample_booking_id: UUID,
     ) -> None:
         """Test send complaint fails when client is not connected."""
         sender = ServiceBusComplaintSender()
@@ -129,9 +126,7 @@ class TestServiceBusComplaintSender:
     @pytest.mark.asyncio
     async def test_send_complaint_failure(
         self,
-        mocker,
-        mock_env_vars: None,
-        sample_booking_id: UUID,  # noqa: ARG002
+        sample_booking_id: UUID,
     ) -> None:
         """Test send complaint handles sending failures."""
         # Setup mocks
@@ -158,7 +153,7 @@ class TestServiceBusComplaintSender:
             )
 
     @pytest.mark.asyncio
-    async def test_context_manager(self, mocker, mock_env_vars: None) -> None:  # noqa: ARG002
+    async def test_context_manager(self, mocker) -> None:
         """Test async context manager behavior."""
         mock_client = MagicMock()
         mock_client.close = AsyncMock()
@@ -179,9 +174,7 @@ class TestServiceBusComplaintSender:
     @pytest.mark.asyncio
     async def test_message_format(
         self,
-        mocker,
-        mock_env_vars: None,
-        sample_booking_id: UUID,  # noqa: ARG002
+        sample_booking_id: UUID,
     ) -> None:
         """Test that message is formatted correctly as JSON."""
         mock_sender = AsyncMock()
