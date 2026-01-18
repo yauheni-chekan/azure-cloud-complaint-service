@@ -7,6 +7,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
+from prometheus_client import make_asgi_app
 
 from app.api.v1 import router as v1_router
 from app.config import settings
@@ -75,6 +76,9 @@ app.add_middleware(
 
 # Include API v1 router
 app.include_router(v1_router, prefix="/api/v1", tags=["v1"])
+
+# Prometheus metrics endpoint
+app.mount("/metrics", make_asgi_app())
 
 
 @app.get("/", include_in_schema=False)
