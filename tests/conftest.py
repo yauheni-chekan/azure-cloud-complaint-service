@@ -16,6 +16,9 @@ os.environ.setdefault(
 )
 os.environ.setdefault("SERVICE_BUS_QUEUE_NAME", "test-complaints-queue")
 os.environ.setdefault("DEBUG", "False")
+# Keep unified logging disabled during tests (no network calls).
+os.environ.setdefault("UNIFIED_LOGS_STORAGE_CONNECTION_STRING", "")
+os.environ.setdefault("UNIFIED_LOGS_QUEUE_NAME", "unified-logs")
 
 from app.main import app
 

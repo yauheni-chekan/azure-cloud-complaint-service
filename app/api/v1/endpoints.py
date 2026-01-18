@@ -3,11 +3,12 @@
 import logging
 from datetime import UTC, datetime
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, HTTPException, status
 
 from app.config import settings
 from app.schemas import ComplaintRequest, ComplaintResponse, HealthResponse
 from app.services.servicebus_client import complaint_sender
+from app.services.unified_log_queue import get_unified_log_sender
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +31,10 @@ router = APIRouter()
         500: {"description": "Internal server error - failed to send message to queue"},
     },
 )
-async def create_complaint(complaint: ComplaintRequest) -> ComplaintResponse:
+async def create_complaint(
+    complaint: ComplaintRequest,
+    background_tasks: BackgroundTasks,
+) -> ComplaintResponse:
     """Submit a complaint for a booking.
 
     This endpoint accepts complaint details and forwards them asynchronously
@@ -52,6 +56,18 @@ async def create_complaint(complaint: ComplaintRequest) -> ComplaintResponse:
 
         logger.info("Complaint submitted for booking %s", complaint.booking_id)
 
+        unified_logs = get_unified_log_sender()
+        if unified_logs is not None:
+            background_tasks.add_task(
+                unified_logs.send,
+                level="INFO",
+                event="complaint.submitted",
+                message="Complaint submitted and forwarded to Service Bus",
+                bookingId=str(complaint.booking_id),
+                serviceBusQueue=settings.service_bus_queue_name,
+                timestamp=timestamp.isoformat(),
+            )
+
         return ComplaintResponse(
             message="Complaint submitted successfully",
             booking_id=complaint.booking_id,
@@ -60,6 +76,16 @@ async def create_complaint(complaint: ComplaintRequest) -> ComplaintResponse:
 
     except Exception:
         logger.exception("Failed to submit complaint")
+        unified_logs = get_unified_log_sender()
+        if unified_logs is not None:
+            background_tasks.add_task(
+                unified_logs.send,
+                level="ERROR",
+                event="complaint.failed",
+                message="Failed to submit complaint",
+                bookingId=str(complaint.booking_id),
+                serviceBusQueue=settings.service_bus_queue_name,
+            )
         msg = "Failed to submit complaint. Please try again later."
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

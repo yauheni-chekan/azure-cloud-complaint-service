@@ -10,6 +10,7 @@ from fastapi.responses import RedirectResponse
 
 from app.api.v1 import router as v1_router
 from app.config import settings
+from app.services.unified_log_queue import get_unified_log_sender
 
 # Configure logging
 logging.basicConfig(
@@ -29,9 +30,22 @@ async def lifespan(_app: FastAPI) -> Generator[None]:
     # Startup
     logger.info("Starting %s v%s", settings.app_name, settings.app_version)
     logger.info("Service Bus Queue: %s", settings.service_bus_queue_name)
+    unified_logs = get_unified_log_sender()
+    if unified_logs is not None:
+        await unified_logs.send(
+            level="INFO",
+            event="service.startup",
+            message="Service started",
+        )
     yield
     # Shutdown
     logger.info("Shutting down %s", settings.app_name)
+    if unified_logs is not None:
+        await unified_logs.send(
+            level="INFO",
+            event="service.shutdown",
+            message="Service shutting down",
+        )
 
 
 # Create FastAPI application

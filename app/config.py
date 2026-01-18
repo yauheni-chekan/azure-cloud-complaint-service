@@ -10,6 +10,11 @@ class Settings(BaseSettings):
     complaint_send_primary_connection_string: str
     service_bus_queue_name: str = "complaints-event"
 
+    # Unified logs (Azure Storage Queue)
+    # If connection string is empty, unified logging is disabled.
+    unified_logs_storage_connection_string: str = ""
+    unified_logs_queue_name: str = "grooming-service-logs"
+
     # Application Configuration
     app_name: str = "ComplaintService"
     app_version: str = "0.1.0"
