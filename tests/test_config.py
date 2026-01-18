@@ -49,11 +49,14 @@ def test_settings_missing_required_field(monkeypatch: pytest.MonkeyPatch) -> Non
     monkeypatch.delenv("APP_VERSION", raising=False)
 
     # Also prevent loading from .env file
-    monkeypatch.setattr("app.config.Settings.model_config", {
-        "env_file": None,
-        "case_sensitive": False,
-        "extra": "ignore",
-    })
+    monkeypatch.setattr(
+        "app.config.Settings.model_config",
+        {
+            "env_file": None,
+            "case_sensitive": False,
+            "extra": "ignore",
+        },
+    )
 
     with pytest.raises(ValidationError) as exc_info:
         Settings()

@@ -22,6 +22,7 @@ logger = logging.getLogger(__name__)
 # Suppress verbose Azure SDK logs (only show warnings and errors)
 logging.getLogger("azure").setLevel(logging.WARNING)
 
+
 @asynccontextmanager
 async def lifespan(_app: FastAPI) -> Generator[None]:
     """Lifespan context manager for startup and shutdown events."""

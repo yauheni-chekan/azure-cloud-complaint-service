@@ -64,7 +64,10 @@ class TestServiceBusComplaintSender:
 
     @pytest.mark.asyncio
     async def test_send_complaint_success(
-        self, mocker, mock_env_vars: None, sample_booking_id: UUID  # noqa: ARG002
+        self,
+        mocker,
+        mock_env_vars: None,
+        sample_booking_id: UUID,  # noqa: ARG002
     ) -> None:
         """Test successful complaint message sending."""
         # Setup mocks
@@ -88,9 +91,7 @@ class TestServiceBusComplaintSender:
         )
 
         # Verify queue sender was called
-        mock_client.get_queue_sender.assert_called_once_with(
-            queue_name=sender._queue_name
-        )
+        mock_client.get_queue_sender.assert_called_once_with(queue_name=sender._queue_name)
 
         # Verify message was sent
         mock_sender.send_messages.assert_awaited_once()
@@ -108,7 +109,9 @@ class TestServiceBusComplaintSender:
 
     @pytest.mark.asyncio
     async def test_send_complaint_no_client(
-        self, mock_env_vars: None, sample_booking_id: UUID  # noqa: ARG002
+        self,
+        mock_env_vars: None,
+        sample_booking_id: UUID,  # noqa: ARG002
     ) -> None:
         """Test send complaint fails when client is not connected."""
         sender = ServiceBusComplaintSender()
@@ -125,7 +128,10 @@ class TestServiceBusComplaintSender:
 
     @pytest.mark.asyncio
     async def test_send_complaint_failure(
-        self, mocker, mock_env_vars: None, sample_booking_id: UUID  # noqa: ARG002
+        self,
+        mocker,
+        mock_env_vars: None,
+        sample_booking_id: UUID,  # noqa: ARG002
     ) -> None:
         """Test send complaint handles sending failures."""
         # Setup mocks
@@ -172,7 +178,10 @@ class TestServiceBusComplaintSender:
 
     @pytest.mark.asyncio
     async def test_message_format(
-        self, mocker, mock_env_vars: None, sample_booking_id: UUID  # noqa: ARG002
+        self,
+        mocker,
+        mock_env_vars: None,
+        sample_booking_id: UUID,  # noqa: ARG002
     ) -> None:
         """Test that message is formatted correctly as JSON."""
         mock_sender = AsyncMock()

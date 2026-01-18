@@ -1,5 +1,6 @@
 """Tests for API endpoints."""
 
+import json
 from datetime import datetime
 from unittest.mock import AsyncMock, MagicMock, patch
 from uuid import UUID
@@ -205,26 +206,22 @@ class TestRootEndpoint:
     """Tests for GET / root endpoint."""
 
     def test_root_endpoint(self, test_client: TestClient) -> None:
-        """Test root endpoint returns service information."""
-        response = test_client.get("/")
+        """Test root endpoint redirects to docs."""
+        response = test_client.get("/", follow_redirects=False)
 
-        assert response.status_code == 200
-        data = response.json()
-        assert "service" in data
-        assert "version" in data
-        assert "docs" in data
-        assert "health" in data
+        assert response.status_code == 307
+        assert response.headers["location"] == "/docs"
 
     def test_root_endpoint_links(self, test_client: TestClient) -> None:
         """Test root endpoint provides correct links."""
-        response = test_client.get("/")
+        response = test_client.get("/openapi.json")
 
         assert response.status_code == 200
         data = response.json()
-        assert data["docs"] == "/docs"
-        assert data["health"] == "/api/v1/health"
-        assert data["service"] == "ComplaintService"
-        assert data["version"] == "0.1.0"
+        assert "/api/v1/health" in data["paths"]
+        assert "/api/v1/complaints" in data["paths"]
+        assert data["info"]["title"] == "ComplaintService"
+        assert data["info"]["version"] == "0.1.0"
 
 
 class TestAPIDocumentation:

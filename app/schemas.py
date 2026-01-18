@@ -27,10 +27,10 @@ class ComplaintRequest(BaseModel):
             "examples": [
                 {
                     "bookingId": "123e4567-e89b-12d3-a456-426614174000",
-                    "description": "The groomer was 2 hours late and didn't properly groom my pet."
+                    "description": "The groomer was 2 hours late and didn't properly groom my pet.",
                 }
             ]
-        }
+        },
     }
 
 
@@ -52,10 +52,10 @@ class ComplaintResponse(BaseModel):
                 {
                     "message": "Complaint submitted successfully",
                     "bookingId": "123e4567-e89b-12d3-a456-426614174000",
-                    "timestamp": "2024-01-15T10:30:00Z"
+                    "timestamp": "2024-01-15T10:30:00Z",
                 }
             ]
-        }
+        },
     }
 
 
@@ -68,12 +68,6 @@ class HealthResponse(BaseModel):
 
     model_config = {
         "json_schema_extra": {
-            "examples": [
-                {
-                    "status": "healthy",
-                    "service": "ComplaintService",
-                    "version": "0.1.0"
-                }
-            ]
+            "examples": [{"status": "healthy", "service": "ComplaintService", "version": "0.1.0"}]
         }
     }
