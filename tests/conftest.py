@@ -1,11 +1,21 @@
 """Pytest configuration and shared fixtures."""
 
+import os
 from datetime import UTC, datetime
 from unittest.mock import AsyncMock, MagicMock
 from uuid import UUID
 
 import pytest
 from fastapi.testclient import TestClient
+
+# Ensure required settings exist before any app modules are imported.
+# (Some modules instantiate Settings at import-time.)
+os.environ.setdefault(
+    "COMPLAINT_SEND_PRIMARY_CONNECTION_STRING",
+    "Endpoint=sb://test.servicebus.windows.net/;SharedAccessKeyName=test;SharedAccessKey=testkey123",
+)
+os.environ.setdefault("SERVICE_BUS_QUEUE_NAME", "test-complaints-queue")
+os.environ.setdefault("DEBUG", "False")
 
 from app.main import app
 
