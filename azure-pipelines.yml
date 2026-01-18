@@ -1,4 +1,4 @@
-# Azure Pipeline for Azure Cloud Complaint Service
+# Azure Pipeline for Azure Cloud Booking Service
 # Runs linting (ruff) and tests (pytest)
 
 trigger:
@@ -104,18 +104,9 @@ stages:
               failTaskOnFailedTests: true
             displayName: "Publish test results"
 
-          - task: PublishPipelineArtifact@1
+          - task: PublishCodeCoverageResults@2
             condition: always()
             inputs:
-              targetPath: "$(System.DefaultWorkingDirectory)/coverage.xml"
-              artifact: "coverage-xml"
-              publishLocation: "pipeline"
-            displayName: "Publish coverage.xml artifact"
-
-          - task: PublishPipelineArtifact@1
-            condition: always()
-            inputs:
-              targetPath: "$(System.DefaultWorkingDirectory)/htmlcov"
-              artifact: "coverage-html"
-              publishLocation: "pipeline"
-            displayName: "Publish htmlcov artifact"
+              summaryFileLocation: "$(System.DefaultWorkingDirectory)/coverage.xml"
+              reportDirectory: "$(System.DefaultWorkingDirectory)/htmlcov"
+            displayName: "Publish code coverage results"
