@@ -24,6 +24,9 @@ pool:
 
 variables:
   PythonVersion: "3.13"
+  # Set these in pipeline variables or variable group; replace with your service connection and web app names
+  AzureServiceConnection: "AZURE_SERVICE_CONNECTION"
+  AzureWebAppName: "AZURE_WEB_APP_NAME"
 
 stages:
   - stage: LintAndTest
@@ -110,3 +113,56 @@ stages:
               summaryFileLocation: "$(System.DefaultWorkingDirectory)/coverage.xml"
               reportDirectory: "$(System.DefaultWorkingDirectory)/htmlcov"
             displayName: "Publish code coverage results"
+
+  - stage: Deploy
+    displayName: "Deploy"
+    dependsOn: LintAndTest
+    condition: succeeded()
+    jobs:
+      - job: DeployWebApp
+        displayName: "Deploy to Azure Web App"
+        steps:
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: "$(PythonVersion)"
+            displayName: "Use Python $(PythonVersion)"
+
+          - script: |
+              python -m pip install --upgrade pip
+            displayName: "Upgrade pip"
+
+          - script: |
+              curl -LsSf https://astral.sh/uv/install.sh | sh
+              export PATH="$HOME/.cargo/bin:$PATH"
+              uv --version
+            displayName: "Install uv package manager"
+
+          - script: |
+              export PATH="$HOME/.cargo/bin:$PATH"
+              uv sync --no-dev
+            displayName: "Install production dependencies"
+
+          - script: |
+              export PATH="$HOME/.cargo/bin:$PATH"
+              uv export --no-dev -o requirements.txt
+            displayName: "Export requirements.txt for Oryx"
+
+          - task: CopyFiles@2
+            inputs:
+              SourceFolder: "$(Build.SourcesDirectory)"
+              Contents: |
+                app/**
+                pyproject.toml
+                requirements.txt
+              TargetFolder: "$(Build.ArtifactStagingDirectory)"
+            displayName: "Copy deployable files"
+
+          - task: AzureWebApp@1
+            inputs:
+              azureSubscription: "$(AzureServiceConnection)"
+              appType: "webAppLinux"
+              appName: "$(AzureWebAppName)"
+              package: "$(Build.ArtifactStagingDirectory)"
+              runtimeStack: "PYTHON|3.13"
+              startUpCommand: "uvicorn app.main:app --host 0.0.0.0 --port 8000"
+            displayName: "Deploy to Azure Web App"
