@@ -25,8 +25,8 @@ pool:
 variables:
   PythonVersion: "3.13"
   # Set these in pipeline variables or variable group; replace with your service connection and web app names
-  AzureServiceConnection: "AZURE_SERVICE_CONNECTION"
-  AzureWebAppName: "AZURE_WEB_APP_NAME"
+  # AzureServiceConnection: "AZURE_SERVICE_CONNECTION"
+  # AzureWebAppName: "AZURE_WEB_APP_NAME"
 
 stages:
   - stage: LintAndTest
